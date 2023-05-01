@@ -1,0 +1,50 @@
+<div class="list-processes">
+    <table class="min-w-full text-center text-ml font-light">
+        <thead class="border-b bg-neutral-800 font-medium text-white dark:border-neutral-500 dark:bg-neutral-900">
+         <tr>
+            <th scope="col" class="px-6 py-4">Type</th>
+            <th scope="col" class="px-6 py-4">PID</th>
+            <th scope="col" class="px-6 py-4">Module</th>
+            <th scope="col" class="px-6 py-4">Supervisor</th>
+            <th scope="col" class="px-6 py-4">Status</th>
+            <th scope="col" class="px-6 py-4">State</th>
+            <th scope="col" class="px-6 py-4"></th>
+            <th scope="col" class="px-6 py-4"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <%= for process <- @workers do %>
+            <tr class="border-b transition duration-300 ease-in-out hover:bg-neutral-100 dark:border-neutral-500 dark:hover:bg-neutral-600">
+                <td><%= process.type %></td>
+                <td>
+                    <%= if is_pid(process.pid) do  %>
+                        <%= :erlang.pid_to_list(process.pid) %>
+                    <% else %>
+                        <%= process.pid %>
+                    <% end %>
+                </td>
+                <td><%= process.module_name %></td>
+                <td><%= inspect(process.supervisor_name) %></td>
+                <td><%= process.status %></td>
+                <td><%= process.state %></td>
+               <td>
+                    <button class="rounded-md bg-pink-100 p-4" phx-click="kill-process"
+                            id="kill-process" phx-value-id={process.id} >
+                        <%= if process.status == :active do  %>
+                            Kill
+                        <% else %>
+                            Delete
+                        <% end %>
+                    </button>
+                </td>
+                <td>
+                    <button class="rounded-md bg-pink-100 p-4" phx-click="brutally-kill-process"
+                            id="brutally-kill-process" phx-value-id={process.id}  disabled={if process.status == :active do false else true end}>
+                        Brutally Kill
+                    </button>
+                </td>
+            </tr>
+        <%end%>
+        </tbody>
+    </table>
+</div>

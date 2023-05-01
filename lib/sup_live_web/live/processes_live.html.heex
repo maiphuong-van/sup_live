@@ -1,0 +1,15 @@
+<div class="p-8">
+<button  class="rounded-full bg-pink-100 p-4" phx-click="create-workers-view">Create Processes</button>
+<button  class="rounded-full bg-pink-100 p-4" phx-click="list-workers">List Workers</button>
+<button  class="rounded-full bg-pink-100 p-4" phx-click="supervision-tree-view">Supervision Tree View</button>
+</div>
+
+<%= if @create_workers do %>
+    <.live_component module={SupLiveWeb.Components.CreateWorkersLiveComponent} id="create_workers"/>
+<% end %>
+<%= if @list_workers do %>
+    <.live_component module={SupLiveWeb.Components.ListProcessesLiveComponent} id="list_workers" processes={@processes} />
+<% end %>
+<%= if @supervision_tree do %>
+    <.live_component module={SupLiveWeb.Components.SupervisionTreeLiveComponent} id="supervision_tree" processes={@processes}/>
+<% end %>

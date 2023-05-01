@@ -1,0 +1,11 @@
+<div>
+    Choose a module to start one or many proceses:
+        <.form for={@form}  phx-submit="start-workers" phx-target={@myself}>
+            <.input type="select" field={@form[:module]} label="Choose a module" options={@worker_modules}/>
+            <.input type="select" field={@form[:strategy]} label="Choose a restart strategy" options={@restart_strategies}/>
+            <.input type="select" field={@form[:restart_type]} label="Choose a restart type" options={@restart_types}/>
+            <.input type="number" field={@form[:max_restarts]} label="Max restarts"/>
+            <.input type="select" field={@form[:children]} options={[1, 2, 5, 10, 100, 1000]} label="Amount of child processes" />
+            <button class="rounded-md bg-pink-100 p-2">Start</button>
+        </.form>
+</div>

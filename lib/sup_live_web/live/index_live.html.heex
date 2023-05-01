@@ -1,0 +1,67 @@
+<div>
+    Choose a module to start one or many proceses:
+
+        <.form for={@form}  phx-submit="start-supervisor">
+            <.input type="select" field={@form[:module]} label="Choose a module" options={@modules}/>
+            <.input type="select" field={@form[:children]} options={[1, 2, 5, 10, 100, 1000]} />
+            <button>Start</button>
+        </.form>
+</div>
+<div>
+    <button phx-click="kill-inactive-processes"
+            id="kill-inactive-processes">
+                Clean inactive
+    </button>
+</div>
+<div class="processes">
+    <table>
+        <colgroup>
+        <col span="1" style="width: 10%;" />
+        <col span="1" style="width: 25%;" />
+        <col span="1" style="width: 25%;" />
+        <col span="1" style="width: 15%;" />
+        <col span="1" style="width: 15%;" />
+        <col span="1" style="width: 10%;" />
+        </colgroup>
+        <tr>
+            <th>PID</th>
+            <th>Supervisor</th>
+            <th>Module</th>
+            <th>Status</th>
+            <th>State</th>
+            <th></th>
+            <th></th>
+        </tr>
+        <%= for process <- @processes do %>
+            <tr>
+                <td>
+                <%= if is_pid(process.pid) do  %>
+                    <%= :erlang.pid_to_list(process.pid) %>
+                <% else %>
+                    <%= process.pid %>
+                <% end %>
+                </td>
+                <td><%=  inspect(process.supervisor) %></td>
+                <td><%= process.module_name %></td>
+                <td><%= process.status %></td>
+                <td><%= process.state %></td>
+                <td>
+                    <button phx-click="kill-process"
+                            id="kill-process" phx-value-id={process.id} >
+                        <%= if process.status == :active do  %>
+                            Kill
+                        <% else %>
+                            Delete
+                        <% end %>
+                    </button>
+                </td>
+                <td>
+                    <button phx-click="brutally-kill-process"
+                            id="brutally-kill-process" phx-value-id={process.id}  disabled={if process.status == :active do false else true end}>
+                        Brutally Kill
+                    </button>
+                </td>
+            </tr>
+        <%end%>
+    </table>
+</div>

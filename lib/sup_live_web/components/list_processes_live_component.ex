@@ -7,46 +7,44 @@ defmodule SupLiveWeb.Components.ListProcessesLiveComponent do
     SupLiveWeb.Endpoint
   ]
 
-  def mount(socket) do
-    {:ok, socket}
-  end
-
   def update(assigns, socket) do
-    workers =
-      assigns.processes
-      |> workers(nil)
+    workers = workers(assigns.processes)
 
-    # Change process state for next live update
-    workers
-    |> Enum.each(fn %{pid: pid, module_name: module} ->
-      module.change(pid)
-    end)
+    if assigns[:change_state] == true do
+      change_state(workers)
+    end
 
     {:ok, assign(socket, workers: workers)}
   end
 
-  defp workers(procesess, supervisor_name) do
+  defp change_state(workers) do
+    workers
+    |> Enum.each(fn %{pid: pid, module_name: module} ->
+      module.change(pid)
+    end)
+  end
+
+  defp workers(procesess) do
     procesess
-    |> workers(supervisor_name, [])
+    |> workers([])
     |> List.flatten()
   end
 
   defp workers(
          [
            %SupLive.SupervisionTree.SupervisorStruct{
-             id: supervisor_id,
+             id: _supervisor_id,
              module_name: module_name,
              children: children
            }
            | res
          ],
-         supervisor_name,
          workers
        )
        when module_name not in @default_supervisors do
-    result = [workers(children, supervisor_id, []) | workers]
+    result = [workers(children, []) | workers]
 
-    workers(res, supervisor_name, result)
+    workers(res, result)
   end
 
   defp workers(
@@ -54,13 +52,10 @@ defmodule SupLiveWeb.Components.ListProcessesLiveComponent do
            %SupLive.SupervisionTree.WorkerStruct{} = worker
            | res
          ],
-         supervisor_name,
          workers
        ) do
-    worker = %{worker | supervisor_name: supervisor_name}
-
-    workers(res, supervisor_name, [worker | workers])
+    workers(res, [worker | workers])
   end
 
-  defp workers(_, _, workers), do: workers
+  defp workers(_, workers), do: workers
 end

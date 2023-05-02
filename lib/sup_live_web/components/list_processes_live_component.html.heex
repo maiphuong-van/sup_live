@@ -1,6 +1,6 @@
 <div class="list-processes">
     <table class="min-w-full text-center text-ml font-light">
-        <thead class="border-b bg-neutral-800 font-medium text-white dark:border-neutral-500 dark:bg-neutral-900">
+        <thead class="border-b bg-pink-800 font-medium text-white dark:border-pink-500 dark:bg-pink-900">
          <tr>
             <th scope="col" class="px-6 py-4">Type</th>
             <th scope="col" class="px-6 py-4">PID</th>
@@ -14,7 +14,7 @@
         </thead>
         <tbody>
         <%= for process <- @workers do %>
-            <tr class="border-b transition duration-300 ease-in-out hover:bg-neutral-100 dark:border-neutral-500 dark:hover:bg-neutral-600">
+            <tr class="border-b transition duration-300 ease-in-out hover:bg-pink-50 dark:border-pink-500 dark:hover:bg-pink-600 p-4">
                 <td><%= process.type %></td>
                 <td>
                     <%= if is_pid(process.pid) do  %>
@@ -24,11 +24,11 @@
                     <% end %>
                 </td>
                 <td><%= process.module_name %></td>
-                <td><%= inspect(process.supervisor_name) %></td>
+                <td><%= inspect(process.supervisor) %></td>
                 <td><%= process.status %></td>
                 <td><%= process.state %></td>
                <td>
-                    <button class="rounded-md bg-pink-100 p-4" phx-click="kill-process"
+                    <button class="rounded-md bg-pink-200 p-4" phx-click="kill-process"
                             id="kill-process" phx-value-id={process.id} >
                         <%= if process.status == :active do  %>
                             Kill
@@ -38,7 +38,7 @@
                     </button>
                 </td>
                 <td>
-                    <button class="rounded-md bg-pink-100 p-4" phx-click="brutally-kill-process"
+                    <button class="rounded-md bg-pink-200 p-4" phx-click="brutally-kill-process"
                             id="brutally-kill-process" phx-value-id={process.id}  disabled={if process.status == :active do false else true end}>
                         Brutally Kill
                     </button>

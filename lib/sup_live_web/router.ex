@@ -17,7 +17,6 @@ defmodule SupLiveWeb.Router do
   scope "/", SupLiveWeb do
     pipe_through :browser
 
-    live "/old_stuff", IndexLive
     live "/", ProcessesLive
   end
 

@@ -3,16 +3,10 @@ defmodule SupLiveWeb.Components.SupervisionTreeLiveComponent do
 
   def render(assigns) do
     ~H"""
-    <div class="supervision-tree" dir="ltr">
-      <ul class="list-disc list-inside">
-        <%= raw(render_processes(assigns.processes)) %>
-      </ul>
+    <div class="supervision-tree p-4">
+      <%= raw(render_processes(assigns.processes)) %>
     </div>
     """
-  end
-
-  def mount(socket) do
-    {:ok, socket}
   end
 
   def update(assigns, socket) do
@@ -28,16 +22,14 @@ defmodule SupLiveWeb.Components.SupervisionTreeLiveComponent do
          pid: pid,
          children: children
        }) do
-    supervisor_data = "<li class\"ps-8\"> #{module_name}:#{render_pid(pid)} </li>"
+    supervisor_data = "<div class=\"pl-8\"> #{module_name}:#{render_pid(pid)}"
 
     case children do
       [] ->
-        supervisor_data
+        supervisor_data <> "</div>"
 
       _ ->
-        supervisor_data <>
-          "<ul class=\"list-disc list-inside\">
-          #{render_processes(children)} </ul>"
+        supervisor_data <> "#{render_processes(children)}" <> "</div>"
     end
   end
 
@@ -45,7 +37,7 @@ defmodule SupLiveWeb.Components.SupervisionTreeLiveComponent do
          module_name: module_name,
          pid: pid
        }) do
-    "<li class\"ps-8\"> #{module_name}:#{render_pid(pid)}</li>"
+    "<div class=\"pl-8\"> #{module_name}:#{render_pid(pid)}</div>"
   end
 
   defp render_pid(pid) do

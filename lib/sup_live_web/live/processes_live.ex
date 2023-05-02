@@ -7,14 +7,12 @@ defmodule SupLiveWeb.ProcessesLive do
   def mount(_param, _session, socket) do
     live_update(socket, "change_state")
 
-    processes = SupLive.SupervisionTree.get_supervision_tree(SupLive.Supervisor)
-
     {:ok,
      assign(socket,
-       processes: processes,
+       processes: processes(),
        create_workers: false,
-       list_workers: false,
-       supervision_tree: true
+       list_workers: true,
+       supervision_tree: false
      )}
   end
 
@@ -43,12 +41,47 @@ defmodule SupLiveWeb.ProcessesLive do
      )}
   end
 
+  def handle_event("kill-process", %{"id" => id}, socket) do
+    case get_process(socket.assigns.processes, id) do
+      %{pid: pid, module_name: module, status: :active} ->
+        module.kill(pid)
+
+      %{id: id, status: :inactive, supervisor: supervisor} ->
+        Supervisor.delete_child(supervisor, id)
+
+      _ ->
+        :ok
+    end
+
+    processes = processes()
+
+    # update_components(processes, socket) |> IO.inspect()
+
+    {:noreply, assign(socket, :processes, processes)}
+  end
+
+  def handle_event("brutally-kill-process", %{"id" => id}, socket) do
+    with %{pid: pid, module_name: module, status: :active} <-
+           get_process(socket.assigns.processes, id) |> IO.inspect() do
+      module.kill(pid, :brutally_kill) |> IO.inspect()
+    end
+
+    processes = processes()
+
+    update_components(processes, socket) |> IO.inspect()
+    {:noreply, assign(socket, :processes, processes)}
+  end
+
   def handle_info("change_state", socket) do
     live_update(socket, "change_state")
-    processes = SupLive.SupervisionTree.get_supervision_tree(SupLive.Supervisor)
+    processes = processes()
 
     if socket.assigns.list_workers do
-      send_update(ListProcessesLiveComponent, processes: processes, id: "list_workers")
+      send_update(ListProcessesLiveComponent,
+        processes: processes,
+        id: "list_workers",
+        change_state: true
+      )
     end
 
     if socket.assigns.supervision_tree do
@@ -57,6 +90,22 @@ defmodule SupLiveWeb.ProcessesLive do
 
     {:noreply, assign(socket, :processes, processes)}
   end
+
+  defp update_components(processes, socket) do
+    if socket.assigns.list_workers do
+      send_update(ListProcessesLiveComponent,
+        processes: processes,
+        id: "list_workers"
+      )
+    end
+
+    if socket.assigns.supervision_tree do
+      send_update(SupervisionTreeLiveComponent, processes: processes, id: "supervision_tree")
+    end
+  end
+
+  defp get_process(processes, id), do: SupLive.SupervisionTree.get_proccess(processes, id)
+  defp processes(), do: SupLive.SupervisionTree.get_supervision_tree(SupLive.Supervisor)
 
   defp live_update(socket, message, time \\ 5000) do
     if connected?(socket),

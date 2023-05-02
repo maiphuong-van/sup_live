@@ -22,13 +22,16 @@ defmodule SupLiveWeb.Components.CreateWorkersLiveComponent do
     :transient
   ]
 
+  @amount_of_child_processes [1, 2, 5, 10, 100, 1000, 100_000]
+
   def mount(socket) do
     {:ok,
      assign(socket,
        form: to_form(ProcessPicker.changeset(%{})),
        worker_modules: @example_workers,
        restart_strategies: @restart_strategies,
-       restart_types: @restart_types
+       restart_types: @restart_types,
+       amount_of_child_processes: @amount_of_child_processes
      )}
   end
 

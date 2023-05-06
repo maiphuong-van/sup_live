@@ -53,23 +53,16 @@ defmodule SupLiveWeb.ProcessesLive do
         :ok
     end
 
-    processes = processes()
-
-    # update_components(processes, socket) |> IO.inspect()
-
-    {:noreply, assign(socket, :processes, processes)}
+    {:noreply, assign(socket, :processes, processes())}
   end
 
   def handle_event("brutally-kill-process", %{"id" => id}, socket) do
     with %{pid: pid, module_name: module, status: :active} <-
-           get_process(socket.assigns.processes, id) |> IO.inspect() do
-      module.kill(pid, :brutally_kill) |> IO.inspect()
+           get_process(socket.assigns.processes, id) do
+      module.kill(pid, :brutally_kill)
     end
 
-    processes = processes()
-
-    update_components(processes, socket) |> IO.inspect()
-    {:noreply, assign(socket, :processes, processes)}
+    {:noreply, assign(socket, :processes, processes())}
   end
 
   def handle_info("change_state", socket) do
@@ -85,23 +78,13 @@ defmodule SupLiveWeb.ProcessesLive do
     end
 
     if socket.assigns.supervision_tree do
-      send_update(SupervisionTreeLiveComponent, processes: processes, id: "supervision_tree")
-    end
-
-    {:noreply, assign(socket, :processes, processes)}
-  end
-
-  defp update_components(processes, socket) do
-    if socket.assigns.list_workers do
-      send_update(ListProcessesLiveComponent,
+      send_update(SupervisionTreeLiveComponent,
         processes: processes,
-        id: "list_workers"
+        id: "supervision_tree"
       )
     end
 
-    if socket.assigns.supervision_tree do
-      send_update(SupervisionTreeLiveComponent, processes: processes, id: "supervision_tree")
-    end
+    {:noreply, assign(socket, :processes, processes)}
   end
 
   defp get_process(processes, id), do: SupLive.SupervisionTree.get_proccess(processes, id)

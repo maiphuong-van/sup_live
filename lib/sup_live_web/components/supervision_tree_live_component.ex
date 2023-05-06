@@ -29,7 +29,7 @@ defmodule SupLiveWeb.Components.SupervisionTreeLiveComponent do
         id -> id
       end
 
-    supervisor_data = "<p>#{module_name}:#{id} - #{render_pid(pid)}</p>"
+    supervisor_data = "<p>#{module_name}: #{id} - #{render_pid(pid)}</p>"
 
     case children do
       [] ->
@@ -51,7 +51,7 @@ defmodule SupLiveWeb.Components.SupervisionTreeLiveComponent do
         _ -> "inactive-process"
       end
 
-    "<p class=\"text-#{colour}\">#{module_name}:#{render_pid(pid)}<p>"
+    "<p class=\"text-#{colour}\">#{module_name}: #{render_pid(pid)}<p>"
   end
 
   defp render_pid(pid) do

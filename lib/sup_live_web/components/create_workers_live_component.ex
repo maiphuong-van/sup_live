@@ -22,7 +22,7 @@ defmodule SupLiveWeb.Components.CreateWorkersLiveComponent do
     :transient
   ]
 
-  @amount_of_child_processes [1, 2, 5, 10, 100, 1000, 100_000]
+  @amount_of_child_processes [1, 2, 5, 10, 100, 1000]
 
   def mount(socket) do
     live_supervisors =

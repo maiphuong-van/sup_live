@@ -24,7 +24,7 @@
                     <% end %>
                 </td>
                 <td><%= process.module_name %></td>
-                <td><%= inspect(process.supervisor) %></td>
+                <td><p class={if process.status == :active do "text-active-process" else "text-inactive-process" end}><%= inspect(process.supervisor) %></p></td>
                 <td><%= process.status %></td>
                 <td><%= process.state %></td>
                <td>

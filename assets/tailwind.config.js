@@ -15,6 +15,8 @@ module.exports = {
     extend: {
       colors: {
         brand: "#FD4F00",
+        'active-process': "#16a34a",
+        'inactive-process': "#dc2626"
       }
     },
   },

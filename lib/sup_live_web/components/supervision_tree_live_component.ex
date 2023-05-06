@@ -47,8 +47,8 @@ defmodule SupLiveWeb.Components.SupervisionTreeLiveComponent do
        }) do
     colour =
       case status do
-        :active -> "lime-500"
-        _ -> "neutral-500"
+        :active -> "active-process"
+        _ -> "inactive-process"
       end
 
     "<p class=\"text-#{colour}\">#{module_name}:#{render_pid(pid)}<p>"

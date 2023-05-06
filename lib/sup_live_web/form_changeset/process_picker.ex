@@ -24,6 +24,8 @@ defmodule SupLiveWeb.FormChangeset.ProcessPicker do
       ]
     )
 
+    field(:supervisor, :string)
+
     field(:restart_type, Ecto.Enum,
       values: [
         :permanent,
@@ -42,7 +44,8 @@ defmodule SupLiveWeb.FormChangeset.ProcessPicker do
       :children,
       :max_restarts,
       :strategy,
-      :restart_type
+      :restart_type,
+      :supervisor
     ])
   end
 

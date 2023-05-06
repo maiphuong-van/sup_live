@@ -25,13 +25,19 @@ defmodule SupLiveWeb.Components.CreateWorkersLiveComponent do
   @amount_of_child_processes [1, 2, 5, 10, 100, 1000, 100_000]
 
   def mount(socket) do
+    live_supervisors =
+      SupLive.SupervisionTree.get_supervision_tree()
+      |> SupLive.SupervisionTree.list_supervisors(SupLive.LiveSupervisor)
+      |> Enum.map(fn %{id: {:global, id}} -> id end)
+
     {:ok,
      assign(socket,
        form: to_form(ProcessPicker.changeset(%{})),
        worker_modules: @example_workers,
        restart_strategies: @restart_strategies,
        restart_types: @restart_types,
-       amount_of_child_processes: @amount_of_child_processes
+       amount_of_child_processes: @amount_of_child_processes,
+       supervisors: [SupLive.Supervisor | live_supervisors]
      )}
   end
 
@@ -43,13 +49,13 @@ defmodule SupLiveWeb.Components.CreateWorkersLiveComponent do
             "max_restarts" => max_restarts,
             "module" => module,
             "strategy" => strategy,
-            "restart_type" => restart
+            "restart_type" => restart,
+            "supervisor" => supervisor
           }
         },
         socket
       ) do
     children_count = String.to_integer(children_count)
-
     restart = String.to_existing_atom(restart)
     strategy = String.to_existing_atom(strategy)
 
@@ -68,18 +74,24 @@ defmodule SupLiveWeb.Components.CreateWorkersLiveComponent do
         }
       end)
 
-    supervisor = {:global, "supervisor_#{UUID.uuid1()}"}
+    child_supervisor = {:global, "supervisor_#{UUID.uuid1()}"}
 
-    opts = [strategy: strategy, name: supervisor, max_restarts: max_restarts]
+    opts = [strategy: strategy, name: child_supervisor, max_restarts: max_restarts]
 
     spec =
       Supervisor.child_spec(
-        {SupLive.LiveSupervisor, [%{children: children, opts: opts, name: supervisor}]},
-        id: supervisor,
+        {SupLive.LiveSupervisor, [%{children: children, opts: opts, name: child_supervisor}]},
+        id: child_supervisor,
         type: :supervisor
       )
 
-    with {:ok, _} <- Supervisor.start_child(SupLive.Supervisor, spec) do
+    supervisor =
+      case supervisor do
+        "Elixir.SupLive.Supervisor" -> String.to_existing_atom(supervisor)
+        supervisor -> {:global, supervisor}
+      end
+
+    with {:ok, _} <- Supervisor.start_child(supervisor, spec) do
       {:noreply, socket}
     else
       _ -> {:noreply, socket}

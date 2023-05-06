@@ -28,8 +28,7 @@
                 <td><%= process.status %></td>
                 <td><%= process.state %></td>
                <td>
-                    <button class="rounded-md bg-pink-200 p-4" phx-click="kill-process"
-                            id="kill-process" phx-value-id={process.id} >
+                    <button class="rounded-md bg-pink-200 hover:bg-pink-600  hover:text-white p-2" phx-click="kill-process" phx-value-id={process.id} >
                         <%= if process.status == :active do  %>
                             Kill
                         <% else %>
@@ -38,8 +37,7 @@
                     </button>
                 </td>
                 <td>
-                    <button class="rounded-md bg-pink-200 p-4" phx-click="brutally-kill-process"
-                            id="brutally-kill-process" phx-value-id={process.id}  disabled={if process.status == :active do false else true end}>
+                    <button class="rounded-md bg-pink-200 hover:bg-pink-600 hover:text-white p-2" phx-click="brutally-kill-process" phx-value-id={process.id}  disabled={if process.status == :active do false else true end}>
                         Brutally Kill
                     </button>
                 </td>

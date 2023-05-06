@@ -20,24 +20,38 @@ defmodule SupLiveWeb.Components.SupervisionTreeLiveComponent do
   defp render_process(%SupLive.SupervisionTree.SupervisorStruct{
          module_name: module_name,
          pid: pid,
+         id: id,
          children: children
        }) do
-    supervisor_data = "<div class=\"pl-8\"> #{module_name}:#{render_pid(pid)}"
+    id =
+      case id do
+        {_, id} -> id
+        id -> id
+      end
+
+    supervisor_data = "<p>#{module_name}:#{id} - #{render_pid(pid)}</p>"
 
     case children do
       [] ->
-        supervisor_data <> "</div>"
+        supervisor_data
 
       _ ->
-        supervisor_data <> "#{render_processes(children)}" <> "</div>"
+        supervisor_data <> "<div class=\"pl-8\"> #{render_processes(children)} </div>"
     end
   end
 
   defp render_process(%SupLive.SupervisionTree.WorkerStruct{
          module_name: module_name,
-         pid: pid
+         pid: pid,
+         status: status
        }) do
-    "<div class=\"pl-8\"> #{module_name}:#{render_pid(pid)}</div>"
+    colour =
+      case status do
+        :active -> "lime-500"
+        _ -> "neutral-500"
+      end
+
+    "<p class=\"text-#{colour}\">#{module_name}:#{render_pid(pid)}<p>"
   end
 
   defp render_pid(pid) do

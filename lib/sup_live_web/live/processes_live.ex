@@ -107,7 +107,7 @@ defmodule SupLiveWeb.ProcessesLive do
   defp get_process(processes, id), do: SupLive.SupervisionTree.get_proccess(processes, id)
   defp processes(), do: SupLive.SupervisionTree.get_supervision_tree(SupLive.Supervisor)
 
-  defp live_update(socket, message, time \\ 5000) do
+  defp live_update(socket, message, time \\ 1000) do
     if connected?(socket),
       do: Process.send_after(self(), message, time)
   end

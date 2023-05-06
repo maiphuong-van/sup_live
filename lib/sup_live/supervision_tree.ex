@@ -82,19 +82,45 @@ defmodule SupLive.SupervisionTree do
     nil
   end
 
-  def get_proccess([process | res], id) do
+  def get_proccess([process | t], id) do
     case process do
       %{id: process_id} when process_id == id ->
         process
 
       %SupervisorStruct{children: children} ->
         case get_proccess(children, id) do
-          nil -> get_proccess(res, id)
+          nil -> get_proccess(t, id)
           process when is_struct(process) -> process
         end
 
       _ ->
-        get_proccess(res, id)
+        get_proccess(t, id)
     end
   end
+
+  @doc "list all supervisors with a provided module name"
+  def list_supervisors(processes, supervisor_module) do
+    list_supervisors(processes, supervisor_module, [])
+  end
+
+  defp list_supervisors([], _, result), do: result
+
+  defp list_supervisors(
+         [process = %SupervisorStruct{children: children, module_name: module_name} | t],
+         supervisor_module,
+         result
+       ) do
+    result =
+      if module_name == supervisor_module do
+        [process | result]
+      else
+        result
+      end
+
+    list_supervisors(t, supervisor_module, result) ++
+      list_supervisors(children, supervisor_module, [])
+  end
+
+  defp list_supervisors([_ | t], supervisor_module, result),
+    do: list_supervisors(t, supervisor_module, result)
 end
